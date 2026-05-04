@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard – TaskFlow{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title" id="dashboard-heading">Dashboard</h1>
+    <a href="{{ url_for('add_task') }}" class="btn btn-primary" id="new-task-btn">+ New Task</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card" id="stat-total">
+      <div class="stat-num" id="stat-total-num">{{ stats.total }}</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card" id="stat-pending">
+      <div class="stat-num" id="stat-pending-num" style="color:var(--warn)">{{ stats.pending }}</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card" id="stat-completed">
+      <div class="stat-num" id="stat-completed-num" style="color:var(--accent)">{{ stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card" id="stat-high">
+      <div class="stat-num" id="stat-high-num" style="color:var(--danger)">{{ stats.high }}</div>
+      <div class="stat-label">High Priority</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters" id="filter-bar">
+    <a href="{{ url_for('dashboard') }}"
+       class="filter-btn {% if filter_status=='all' and filter_priority=='all' %}active{% endif %}"
+       id="filter-all">All</a>
+    <a href="{{ url_for('dashboard', status='pending') }}"
+       class="filter-btn {% if filter_status=='pending' %}active{% endif %}"
+       id="filter-pending">Pending</a>
+    <a href="{{ url_for('dashboard', status='completed') }}"
+       class="filter-btn {% if filter_status=='completed' %}active{% endif %}"
+       id="filter-completed">Completed</a>
+    <a href="{{ url_for('dashboard', priority='high') }}"
+       class="filter-btn {% if filter_priority=='high' %}active{% endif %}"
+       id="filter-high">High Priority</a>
+  </div>
+
+  <!-- Task List -->
+  <div class="card" id="task-list-card">
+    {% if tasks %}
+    <table class="task-table" id="task-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Due Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="task-tbody">
+        {% for task in tasks %}
+        <tr id="task-row-{{ task.id }}">
+          <td>
+            <span class="task-title {% if task.status=='completed' %}completed{% endif %}"
+                  id="task-title-{{ task.id }}">{{ task.title }}</span>
+            {% if task.description %}
+              <div style="font-size:.78rem; color:var(--muted); margin-top:.2rem;">
+                {{ task.description[:60] }}{% if task.description|length > 60 %}…{% endif %}
+              </div>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge badge-{{ task.priority }}" id="task-priority-{{ task.id }}">
+              {{ task.priority }}
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-{{ task.status }}" id="task-status-{{ task.id }}">
+              {{ task.status }}
+            </span>
+          </td>
+          <td style="font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted);">
+            {{ task.due_date or '—' }}
+          </td>
+          <td>
+            <div class="task-actions">
+              <form method="POST" action="{{ url_for('complete_task', task_id=task.id) }}" style="display:inline;">
+                <button type="submit" class="action-btn" id="complete-btn-{{ task.id }}">
+                  {% if task.status == 'pending' %}✓ Complete{% else %}↩ Reopen{% endif %}
+                </button>
+              </form>
+              <a href="{{ url_for('edit_task', task_id=task.id) }}"
+                 class="action-btn" id="edit-btn-{{ task.id }}">Edit</a>
+              <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" style="display:inline;"
+                    onsubmit="return confirm('Delete this task?')">
+                <button type="submit" class="action-btn danger" id="delete-btn-{{ task.id }}">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state" id="empty-state">
+      <div style="font-size:2.5rem; margin-bottom:.75rem;">📋</div>
+      <h3>No tasks found</h3>
+      <p style="font-size:.88rem; margin-top:.4rem;">
+        <a href="{{ url_for('add_task') }}">Create your first task</a>
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

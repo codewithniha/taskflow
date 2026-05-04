@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Search – TaskFlow{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-title">Search Tasks</h1>
+  </div>
+  <div class="search-bar">
+    <form method="GET" style="display:flex; gap:.75rem; width:100%;" id="search-form">
+      <input type="text" id="search-input" name="q" value="{{ query }}" placeholder="Search tasks by title…"/>
+      <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+    </form>
+  </div>
+  {% if query %}
+    <div style="color:var(--muted); font-size:.88rem; margin-bottom:1rem;" id="search-result-count">
+      {{ tasks|length }} result{{ 's' if tasks|length != 1 }} for "<strong>{{ query }}</strong>"
+    </div>
+    {% if tasks %}
+    <div class="card" id="search-results">
+      <table class="task-table">
+        <thead>
+          <tr><th>Title</th><th>Priority</th><th>Status</th><th>Due Date</th></tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr id="search-result-{{ task.id }}">
+            <td><a href="{{ url_for('edit_task', task_id=task.id) }}">{{ task.title }}</a></td>
+            <td><span class="badge badge-{{ task.priority }}">{{ task.priority }}</span></td>
+            <td><span class="badge badge-{{ task.status }}">{{ task.status }}</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:.82rem; color:var(--muted);">
+              {{ task.due_date or '—' }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state" id="no-results">
+      <div style="font-size:2rem; margin-bottom:.5rem;">🔍</div>
+      <h3>No results found</h3>
+      <p style="font-size:.88rem; margin-top:.4rem;">Try a different keyword</p>
+    </div>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

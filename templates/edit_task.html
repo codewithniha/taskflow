@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Edit Task – TaskFlow{% endblock %}
+{% block content %}
+<div class="container" style="max-width:600px;">
+  <div class="page-header">
+    <h1 class="page-title">Edit Task</h1>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back</a>
+  </div>
+  <div class="card">
+    {% if error %}
+      <div class="alert-error" id="error-message">{{ error }}</div>
+    {% endif %}
+    <form method="POST" id="edit-task-form">
+      <div class="form-group">
+        <label for="title">Task Title *</label>
+        <input type="text" id="title" name="title" value="{{ task.title }}" required/>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description">{{ task.description }}</textarea>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+        <div class="form-group">
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority">
+            <option value="low"    {% if task.priority=='low'    %}selected{% endif %}>Low</option>
+            <option value="medium" {% if task.priority=='medium' %}selected{% endif %}>Medium</option>
+            <option value="high"   {% if task.priority=='high'   %}selected{% endif %}>High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="pending"   {% if task.status=='pending'   %}selected{% endif %}>Pending</option>
+            <option value="completed" {% if task.status=='completed' %}selected{% endif %}>Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="due_date">Due Date</label>
+          <input type="date" id="due_date" name="due_date" value="{{ task.due_date }}"/>
+        </div>
+      </div>
+      <div style="display:flex; gap:1rem; margin-top:.5rem;">
+        <button type="submit" class="btn btn-primary" id="update-task-btn">Update Task</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

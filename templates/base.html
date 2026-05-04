@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}TaskFlow{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:       #0e0f11;
+      --surface:  #16181c;
+      --border:   #2a2d35;
+      --accent:   #6ee7b7;
+      --accent2:  #f472b6;
+      --text:     #e8eaf0;
+      --muted:    #6b7280;
+      --danger:   #f87171;
+      --warn:     #fbbf24;
+      --radius:   8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif;
+           min-height: 100vh; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between;
+          padding: 0 2rem; height: 60px; border-bottom: 1px solid var(--border);
+          background: var(--surface); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-links .btn-sm { background: var(--accent); color: #0e0f11; padding: .3rem .9rem;
+                         border-radius: var(--radius); font-weight: 600; }
+    .nav-links .btn-sm:hover { opacity: .85; text-decoration: none; }
+
+    /* CONTAINER */
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* CARD */
+    .card { background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.75rem; }
+
+    /* FORM */
+    .form-group { margin-bottom: 1.2rem; }
+    label { display: block; font-size: .85rem; color: var(--muted);
+            margin-bottom: .45rem; font-family: 'DM Mono', monospace; }
+    input[type=text], input[type=email], input[type=password], input[type=date],
+    textarea, select {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); padding: .65rem .9rem;
+      font-family: 'Syne', sans-serif; font-size: .95rem;
+      transition: border-color .2s; }
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    /* BUTTONS */
+    .btn { display: inline-block; padding: .6rem 1.4rem; border-radius: var(--radius);
+           font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem;
+           cursor: pointer; border: none; transition: opacity .2s; }
+    .btn-primary { background: var(--accent); color: #0e0f11; }
+    .btn-secondary { background: transparent; border: 1px solid var(--border);
+                     color: var(--text); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn:hover { opacity: .85; }
+
+    /* FLASH */
+    .flash { padding: .75rem 1.1rem; border-radius: var(--radius); margin-bottom: 1.2rem;
+             font-size: .9rem; }
+    .flash-success { background: rgba(110,231,183,.12); border: 1px solid var(--accent);
+                     color: var(--accent); }
+    .flash-info    { background: rgba(99,179,237,.12); border: 1px solid #63b3ed;
+                     color: #63b3ed; }
+    .flash-error   { background: rgba(248,113,113,.12); border: 1px solid var(--danger);
+                     color: var(--danger); }
+
+    /* ALERTS */
+    .alert-error { background: rgba(248,113,113,.1); border: 1px solid var(--danger);
+                   color: var(--danger); padding: .75rem 1rem; border-radius: var(--radius);
+                   margin-bottom: 1rem; font-size: .9rem; }
+
+    /* PAGE HEADER */
+    .page-header { display: flex; justify-content: space-between; align-items: center;
+                   margin-bottom: 1.75rem; }
+    .page-title { font-size: 1.6rem; font-weight: 800; }
+
+    /* STATS ROW */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border);
+                 border-radius: var(--radius); padding: 1rem 1.25rem; }
+    .stat-num { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: .75rem; color: var(--muted); margin-top: .3rem;
+                  font-family: 'DM Mono', monospace; text-transform: uppercase; }
+
+    /* TASK TABLE */
+    .task-table { width: 100%; border-collapse: collapse; }
+    .task-table th { text-align: left; font-size: .75rem; color: var(--muted);
+                     font-family: 'DM Mono', monospace; text-transform: uppercase;
+                     padding: .6rem .9rem; border-bottom: 1px solid var(--border); }
+    .task-table td { padding: .8rem .9rem; border-bottom: 1px solid var(--border);
+                     font-size: .9rem; vertical-align: middle; }
+    .task-table tr:last-child td { border-bottom: none; }
+    .task-table tr:hover td { background: rgba(255,255,255,.02); }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: .2rem .55rem; border-radius: 4px;
+             font-size: .72rem; font-family: 'DM Mono', monospace; font-weight: 500; }
+    .badge-high     { background: rgba(248,113,113,.15); color: var(--danger); }
+    .badge-medium   { background: rgba(251,191,36,.15);  color: var(--warn); }
+    .badge-low      { background: rgba(110,231,183,.15); color: var(--accent); }
+    .badge-pending  { background: rgba(107,114,128,.2);  color: var(--muted); }
+    .badge-completed{ background: rgba(110,231,183,.15); color: var(--accent); }
+
+    /* TASK ACTIONS */
+    .task-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .action-btn { font-size: .78rem; padding: .25rem .65rem; border-radius: 4px;
+                  cursor: pointer; border: 1px solid var(--border); background: transparent;
+                  color: var(--text); font-family: 'Syne', sans-serif; }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn.danger { border-color: var(--danger); color: var(--danger); }
+    .action-btn.danger:hover { background: rgba(248,113,113,.1); }
+
+    /* FILTERS */
+    .filters { display: flex; gap: .75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filter-btn { font-size: .82rem; padding: .35rem .9rem; border-radius: 20px;
+                  border: 1px solid var(--border); background: transparent;
+                  color: var(--muted); cursor: pointer; font-family: 'Syne', sans-serif; }
+    .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    /* SEARCH BAR */
+    .search-bar { display: flex; gap: .75rem; margin-bottom: 1.5rem; }
+    .search-bar input { flex: 1; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 3rem; color: var(--muted); }
+    .empty-state h3 { font-size: 1.1rem; margin-bottom: .5rem; color: var(--text); }
+
+    /* TASK TITLE STRIKE */
+    .task-title.completed { text-decoration: line-through; color: var(--muted); }
+  </style>
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<nav>
+  <a class="nav-brand" href="{{ url_for('dashboard') }}">⬡ TaskFlow</a>
+  <div class="nav-links">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('add_task') }}">+ New Task</a>
+    <a href="{{ url_for('search') }}">Search</a>
+    <a href="{{ url_for('profile') }}">Profile</a>
+    <a href="{{ url_for('logout') }}" class="btn-sm">Logout</a>
+  </div>
+</nav>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container" style="padding-bottom:0">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}" id="flash-message">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+</body>
+</html>
