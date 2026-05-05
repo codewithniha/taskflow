@@ -13,6 +13,7 @@ For headless Chrome on Jenkins/EC2:
     Tests already use headless mode by default (see get_driver()).
 """
 
+import os
 import time
 import random
 import pytest
@@ -24,8 +25,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 
 # ── Config ────────────────────────────────────────────────────────────────────
+# APP_URL can be overridden via environment variable so the test container
+# can target the deployed app container (e.g. http://taskflow-app:5000).
+# Falls back to localhost for local development.
 
-BASE_URL     = "http://127.0.0.1:5000"
+BASE_URL     = os.environ.get("APP_URL", "http://127.0.0.1:5000")
 WAIT_TIMEOUT = 10   # seconds
 
 
