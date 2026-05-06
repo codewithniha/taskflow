@@ -48,26 +48,30 @@ pipeline {
         }
 
         stage('Run Selenium Tests') {
-            steps {
-                echo "Installing dependencies..."
-                sh 'pip install -r requirements.txt --break-system-packages'
+    steps {
+        echo "Installing dependencies..."
+        sh '''
+            # Install pip if missing
+            python3 -m ensurepip --upgrade 2>/dev/null || true
+            python3 -m pip install -r requirements.txt --break-system-packages
+        '''
 
-                echo "Running tests..."
-                sh """
-                    mkdir -p test-results
-                    APP_URL=http://localhost:${APP_PORT} \
-                    pytest test_taskflow.py -v \
-                           --tb=short \
-                           --junit-xml=test-results/results.xml
-                """
-            }
-            post {
-                always {
-                    junit allowEmptyResults: true,
-                          testResults: 'test-results/results.xml'
-                }
-            }
+        echo "Running tests..."
+        sh '''
+            mkdir -p test-results
+            APP_URL=http://localhost:5000 \
+            python3 -m pytest test_taskflow.py -v \
+                   --tb=short \
+                   --junit-xml=test-results/results.xml
+        '''
+    }
+    post {
+        always {
+            junit allowEmptyResults: true,
+                  testResults: 'test-results/results.xml'
         }
+    }
+}
     }
 
     post {
