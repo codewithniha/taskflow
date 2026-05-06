@@ -51,16 +51,18 @@ pipeline {
     steps {
         echo "Installing pip and dependencies..."
         sh '''
-            # Install pip properly via apt
-            sudo apt-get update -y
-            sudo apt-get install -y python3-pip
+            # Download pip installer directly — no sudo needed
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            python3 get-pip.py --user
+            export PATH=$HOME/.local/bin:$PATH
 
-            # Now install project dependencies
-            python3 -m pip install -r requirements.txt --break-system-packages
+            # Install project dependencies
+            python3 -m pip install -r requirements.txt --user
         '''
 
         echo "Running tests..."
         sh '''
+            export PATH=$HOME/.local/bin:$PATH
             mkdir -p test-results
             APP_URL=http://localhost:5000 \
             python3 -m pytest test_taskflow.py -v \
