@@ -49,10 +49,13 @@ pipeline {
 
         stage('Run Selenium Tests') {
     steps {
-        echo "Installing dependencies..."
+        echo "Installing pip and dependencies..."
         sh '''
-            # Install pip if missing
-            python3 -m ensurepip --upgrade 2>/dev/null || true
+            # Install pip properly via apt
+            sudo apt-get update -y
+            sudo apt-get install -y python3-pip
+
+            # Now install project dependencies
             python3 -m pip install -r requirements.txt --break-system-packages
         '''
 
