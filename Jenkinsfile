@@ -49,23 +49,20 @@ pipeline {
 
         stage('Run Selenium Tests') {
     steps {
-        echo "Installing pip and dependencies..."
+        echo "Setting up virtual environment and installing dependencies..."
         sh '''
-            # Download pip installer directly — no sudo needed
-            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-            python3 get-pip.py --user
-            export PATH=$HOME/.local/bin:$PATH
+            # Create a virtual environment inside the workspace
+            python3 -m venv venv
 
-            # Install project dependencies
-            python3 -m pip install -r requirements.txt --user
+            # Install dependencies inside the venv
+            venv/bin/pip install -r requirements.txt
         '''
 
         echo "Running tests..."
         sh '''
-            export PATH=$HOME/.local/bin:$PATH
             mkdir -p test-results
             APP_URL=http://localhost:5000 \
-            python3 -m pytest test_taskflow.py -v \
+            venv/bin/pytest test_taskflow.py -v \
                    --tb=short \
                    --junit-xml=test-results/results.xml
         '''
