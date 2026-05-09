@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
+# this line is for testing code
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'selenium-test-secret-key-2024'
